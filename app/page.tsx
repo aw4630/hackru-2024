@@ -1,18 +1,25 @@
 import Client from "@/components/client";
+import Client from "@/components/client";
 import Image from "next/image";
 import {fetchAccessToken} from 'hume';
+<<<<<<< HEAD
 import {fetchAccessToken} from 'hume';
+=======
+>>>>>>> 9f017d8 (new changes)
 
 export default async function Home() {
   const accessToken = fetchAccessToken({
     apiKey: String(process.env.HUME_API_KEY),
     secretKey: String(process.env.HUME_SECRET_KEY),
   })
+<<<<<<< HEAD
 export default async function Home() {
   const accessToken = fetchAccessToken({
     apiKey: String(process.env.HUME_API_KEY),
     secretKey: String(process.env.HUME_SECRET_KEY),
   })
+=======
+>>>>>>> 9f017d8 (new changes)
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -61,7 +68,10 @@ export default async function Home() {
           </a>
         </div>
         <Client accessToken={accessToken.toString()}/>
+<<<<<<< HEAD
         <Client accessToken={accessToken.toString()}/>
+=======
+>>>>>>> 9f017d8 (new changes)
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
