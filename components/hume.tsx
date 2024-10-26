@@ -74,14 +74,21 @@ export default function Hume(){
         <div>
             <div>
                 {chatHistory.map((chat, index)=>(
+<<<<<<< HEAD
                     <div key={index} className={`mb-4 flex ${chat.sender==='user'?'justify-end':'justify-start'}`} >
                         <span className={`inline-block p-2.5 rounded-xl max-w-[70%] ${chat.sender==='user'?'bg-blue-600':'bg-gray-600'}`}>
                             <p className="text-white">{chat.text}</p>
+=======
+                    <div key={index} className={`mb-4 flex ${chat.sender==='user'?'justify-end':'justify-start'}`}>
+                        <span className={`inline-block p-3 rounded-lg max-w-[70%] ${chat.sender==='user'?'bg-slate-600':'bg-white border border-gray-600'}`}>
+                            {chat.text}
+>>>>>>> 6da95b1 (new changes)
                         </span>
                     </div>
                 ))}
             </div>
        
+<<<<<<< HEAD
             <div>
                 <button
                     onClick={readyState===VoiceReadyState.OPEN ? handleDisconnect : handleConnect}
@@ -100,6 +107,26 @@ export default function Hume(){
                     <Send size={24} />
                 </button>
             </div>
+=======
+        <div>
+            <button
+                onClick={readyState===VoiceReadyState.OPEN ? handleDisconnect : handleConnect}
+                disabled={requestingPermission}
+            >
+                {requestingPermission ? ('Requesting permissions...') :
+                readyState === VoiceReadyState.OPEN ? (<MicOff size={24} />) : (<Mic size={24}/>)}
+            </button>
+            <input
+                type="text"
+                value={message}
+                onChange={(e)=>setMessage(e.target.value)}
+                placeholder="Enter message..."
+            />
+            <button onClick={sendMessage}>
+                <Send size={24} />
+            </button>
+        </div>
+>>>>>>> 6da95b1 (new changes)
         </div>
     )
 }
