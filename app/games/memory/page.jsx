@@ -1,166 +1,66 @@
-"use client";
-
 import React, { useState, useEffect } from 'react';
 
-// Card data
-const cardImages = [
-  { id: 1, src: '/images/apple.png' },
-  { id: 2, src: '/images/banana.png' },
-  { id: 3, src: '/images/cherry.png' },
-  { id: 4, src: '/images/grape.png' },
-  { id: 5, src: '/images/orange.png' },
-  { id: 6, src: '/images/watermelon.png' },
-];
-
-export default function MemoryMatchingGame() {
+function MemoryGame() {
   const [cards, setCards] = useState([]);
-  const [firstChoice, setFirstChoice] = useState(null);
-  const [secondChoice, setSecondChoice] = useState(null);
+  const [selected, setSelected] = useState([]);
+  const [matched, setMatched] = useState([]);
   const [disabled, setDisabled] = useState(false);
-  const [score, setScore] = useState(0);
-  const [difficulty, setDifficulty] = useState('easy');
 
-  // Shuffle and set cards based on difficulty
   useEffect(() => {
-    shuffleCards();
-  }, [difficulty]);
+    const uploadedImages = JSON.parse(localStorage.getItem('uploadedImages')) || [];
 
-  const shuffleCards = () => {
-    let selectedCards;
-    switch (difficulty) {
-      case 'medium':
-        selectedCards = cardImages.slice(0, 4); // 4 pairs
-        break;
-      case 'hard':
-        selectedCards = cardImages.slice(0, 6); // 6 pairs
-        break;
-      default:
-        selectedCards = cardImages.slice(0, 3); // 3 pairs (easy)
-    }
-
-    const shuffledCards = [...selectedCards, ...selectedCards]
+    const shuffledCards = [...uploadedImages, ...uploadedImages]
       .sort(() => Math.random() - 0.5)
-      .map((card) => ({ ...card, matched: false, id: Math.random() }));
+      .map((img, index) => ({ img, id: index, flipped: false }));
+
     setCards(shuffledCards);
-    setScore(0); // Reset score when difficulty changes
-    resetTurn(); // Reset choices
-  };
+  }, []);
 
-  const handleChoice = (card) => {
-    firstChoice ? setSecondChoice(card) : setFirstChoice(card);
-  };
+  const handleSelect = (index) => {
+    if (disabled || cards[index].flipped) return;
 
-  // Check for a match
-  useEffect(() => {
-    if (firstChoice && secondChoice) {
+    const newSelected = [...selected, index];
+    const updatedCards = cards.map((card, i) =>
+      i === index ? { ...card, flipped: true } : card
+    );
+
+    setCards(updatedCards);
+    setSelected(newSelected);
+
+    if (newSelected.length === 2) {
       setDisabled(true);
-      if (firstChoice.src === secondChoice.src) {
-        setCards((prevCards) =>
-          prevCards.map((card) =>
-            card.src === firstChoice.src ? { ...card, matched: true } : card
+      checkMatch(newSelected);
+    }
+  };
+
+  const checkMatch = ([firstIndex, secondIndex]) => {
+    if (cards[firstIndex].img === cards[secondIndex].img) {
+      setMatched([...matched, firstIndex, secondIndex]);
+    } else {
+      setTimeout(() => {
+        setCards((prev) =>
+          prev.map((card, i) =>
+            i === firstIndex || i === secondIndex ? { ...card, flipped: false } : card
           )
         );
-        setScore((prevScore) => prevScore + 10); // Increase score by 10 for a correct match
-      }
-      setTimeout(() => resetTurn(), 1000);
+      }, 1000);
     }
-  }, [firstChoice, secondChoice]);
-
-  // Reset choices & enable cards
-  const resetTurn = () => {
-    setFirstChoice(null);
-    setSecondChoice(null);
+    setSelected([]);
     setDisabled(false);
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Memory Matching Game</h1>
-      <div style={styles.info}>
-        <span>Score: {score}</span>
-        <select
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-          style={styles.select}
-        >
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-      </div>
-      <div style={styles.grid}>
-        {cards.map((card) => (
-          <div
-            key={card.id}
-            style={{
-              ...styles.card,
-              opacity: card.matched ? 0.5 : 1,
-              pointerEvents: card.matched || disabled ? 'none' : 'auto',
-            }}
-            onClick={() => handleChoice(card)}
-          >
-            <img
-              src={
-                firstChoice === card || secondChoice === card || card.matched
-                  ? card.src
-                  : '/images/cover.png'
-              }
-              alt="card"
-              style={styles.image}
-            />
-          </div>
-        ))}
-      </div>
+    <div className="memory-game">
+      {cards.map((card, index) => (
+        <div key={index} className={`card ${card.flipped ? 'flipped' : ''}`} onClick={() => handleSelect(index)}>
+          <img
+            src={card.flipped || matched.includes(index) ? card.img : '/cliparts/placeholder.png'}
+            alt="memory card"
+          />
+        </div>
+      ))}
     </div>
   );
 }
 
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    height: '100vh',
-    backgroundColor: '#f7f7f7',
-    padding: '20px',
-  },
-  title: {
-    fontSize: '32px',
-    marginBottom: '10px',
-  },
-  info: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: '600px',
-    marginBottom: '20px',
-  },
-  select: {
-    padding: '5px 10px',
-    fontSize: '16px',
-    borderRadius: '8px',
-    border: '1px solid #ccc',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-    gap: '10px',
-    maxWidth: '600px',
-    width: '100%',
-  },
-  card: {
-    width: '100%',
-    height: '150px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    backgroundColor: '#fff',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
-};
-
+export default MemoryGame;
