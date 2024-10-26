@@ -1,8 +1,13 @@
 import Client from "@/components/client";
-import Client from "@/components/client";
 import Image from "next/image";
 import {fetchAccessToken} from 'hume';
+import {fetchAccessToken} from 'hume';
 
+export default async function Home() {
+  const accessToken = fetchAccessToken({
+    apiKey: String(process.env.HUME_API_KEY),
+    secretKey: String(process.env.HUME_SECRET_KEY),
+  })
 export default async function Home() {
   const accessToken = fetchAccessToken({
     apiKey: String(process.env.HUME_API_KEY),
@@ -55,6 +60,7 @@ export default async function Home() {
             Read our docs
           </a>
         </div>
+        <Client accessToken={accessToken.toString()}/>
         <Client accessToken={accessToken.toString()}/>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
